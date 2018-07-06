@@ -1,15 +1,12 @@
 <!-- 
 	ISSUES:
-	* dependencies section gives "not found" error sometimes
-	*
+	* 
 	
 	TODO's:
 	* adjust/understand bootstrap bc the loader/spinner moves around if you change the page size whereas other elements don't.
-	* utilize the input date values
-		- correctly get start/end strings from javascript
-		- send to django
-		- get django to filter
-	* add a simulated/real/both option to the UI-->
+	* add a simulated/real/both option to the UI
+	
+-->
 
 <html>
     <head>
@@ -70,10 +67,9 @@
 	
     <body>
 		<h1>Brett's Weather Logger Site</h1>
-        <h2>(Under construction)</h2>
 		
 		
-		<!-- draw date/time input -->
+		<!-- date/time inputs-->
 		<div class="panel panel-primary">
 			<div class="panel-heading"></div>
 				<div class="panel-body">
@@ -140,7 +136,7 @@
 
 
 		
-		<!-- run date time picker -->
+
 		<script>
 			//appearance during data fetch
 			$(document).ajaxStart(function(){
@@ -166,38 +162,109 @@
 			$(function () {
 				$('#enddatetime').datetimepicker();
 			});
-		</script>
-		
-		
-		<!-- getdata on button press-->
-		<script>
-			//real values
-			var datetimes = [];
-			var humidities = [];
-			var temps = [];
-			var pressures = [];
 			
-			//sim values
-			var simDates = [];
-			var hSims = [];
-			var tSims = [];
-		    var pSims = [];
-			
+			//validates and converts date/time string inputs into proper format ('yyyy-mm-dd hh:mm:ss')
+			function getValidDT(){
+				
+				//read datetimes from input boxes
+				var startString = document.getElementById("start").value;
+				var endString = document.getElementById("end").value;
+				
+				//get current datetime -> (yyyy-mm-dd hh:mm:ss) format
+				var now = new Date();
+				var nowMonth = (((now.getMonth()) < 9 ? "0" : "") + ((now.getMonth()) + 1));
+				var nowDate = (((now.getDate()) < 9 ? "0" : "") + (now.getDate()));
+				var nowHrs = (((now.getHours()) < 9 ? "0" : "") + (now.getHours()));
+				var nowMins = (((now.getMinutes()) < 9 ? "0" : "") + (now.getMinutes()));
+				var nowSecs = (((now.getSeconds()) < 9 ? "0" : "") + (now.getSeconds()));
+				var nowString = now.getFullYear() + "-" + nowMonth + "-" + nowDate + " " + nowHrs + ":" + nowMins + ":" + nowSecs;
+				
+				/**handle empty strings**/
+				//set starting datetime to earliest data point if empty
+				if (startString == "") {
+					startString = "2018-06-07 00:00:00";
+				}
+				//set ending datetime to current if empty
+				if (endString == "") {
+					endString = nowString;
+				}
+				
+				
+				/**handle boundary and order problems**/
+				var start = new Date(startString);
+				var end = new Date(endString);
+				//display error and return failure if dates out of order
+				if(start >= end){
+					alert("**End time must come after start time");
+					return null;
+				}
+
+				//date/time must be AFTER initial sensor data (June 7, 2018)
+				if (start < new Date("2018-06-07 00:00:00")) {
+					startString = "2018-06-07 00:00:00";
+				}
+				//date/time must be BEFORE current date/time
+				if (end > now) {
+					endString = nowString;
+				}
+				
+				
+				/**Finalize datetime strings -> (yyyy-mm-dd hh:mm:ss) format**/
+				//finalize start datetime input 
+				var startMonth = (((start.getMonth()) < 9 ? "0" : "") + ((start.getMonth()) + 1));
+				var startDate = (((start.getDate()) < 9 ? "0" : "") + ((start.getDate())));
+				var startHrs = (((start.getHours()) < 9 ? "0" : "") + ((start.getHours())));
+				var startMins = (((start.getMinutes()) < 9 ? "0" : "") + ((start.getMinutes())));
+				var startSecs = (((start.getSeconds()) < 9 ? "0" : "") + ((start.getSeconds())));
+				startString = start.getFullYear() + "-" + startMonth + "-" + startDate + " " + startHrs + ":" + startMins + ":" + startSecs;
+				//finalize end datetime input
+				var endMonth = (((end.getMonth()) < 9 ? "0" : "") + ((end.getMonth()) + 1));
+				var endDate = (((end.getDate()) < 9 ? "0" : "") + ((end.getDate())));
+				var endHrs = (((end.getHours()) < 9 ? "0" : "") + ((end.getHours())));
+				var endMins = (((end.getMinutes()) < 9 ? "0" : "") + ((end.getMinutes())));
+				var endSecs = (((end.getSeconds()) < 9 ? "0" : "") + ((end.getSeconds())));
+				endString = end.getFullYear() + "-" + endMonth + "-" + endDate + " " + endHrs + ":" + endMins + ":" + endSecs;
+				
+				
+				return [startString, endString];
+			} //end validateDT
+
+		
+			//fetches data from database
 			function getdata(){
+				
+				//real values
+				var datetimes = [];
+				var humidities = [];
+				var temps = [];
+				var pressures = [];
+				
+				//sim values
+				var simDates = [];
+				var hSims = [];
+				var tSims = [];
+				var pSims = [];
+			
 				//stats table values
 				var hAvg, tAvg, pAvg;
 				var hStdv, tStdv, pStdv;
 				
-				//get start and end times
-				var start = document.getElementById("start").value;
-				var end = document.getElementById("end").value;
-				
-				
+
+				/**get valid start and end datetimes**/
+				var validated = getValidDT();
+				//return failure if dates are out of order
+				if (validated == null){
+					return null;
+				}
+				var startString = validated[0];
+				var endString = validated[1];
+	
+	
 				//fetch data from database
 				$.ajax({
 					type: "POST",
 					dataType: "json",
-					data: {'start': start, 'end':end},
+					data: {'start': startString, 'end':endString},
 					url: "getdata/",
 					success: function(result){
 					    //real values
@@ -244,10 +311,6 @@
 			}//end getdata()
 			
 			
-			//get data on page startup
-			getdata();
-			
-			
 			//returns mean and standard deviation of array
 			function stats(arr) {
 				var n = arr.length;
@@ -286,11 +349,8 @@
 				};
 			}; //end stats
 			
-		</script>
-		
 
-		<script>
-			//draw plot
+			//draws time series plot with real and simulated values
 			function plot(dates, values, simDates, sims, Title, units, div){
 				
 				var plot1 = document.getElementById(div);
@@ -325,6 +385,18 @@
 				Plotly.plot(plot1, trace, layout); 
 			
 			}//end plot
+			
+			
+			/**RUN AT PAGE STARTUP*****************************************************************************************/
+			//get data on page startup
+			getdata();
+			
+			//initialize start and end date/time inputs
+			document.getElementById("start").value = "06/07/2018 12:00 AM";
+			t0 = new Date();
+			document.getElementById("end").value = (t0.getMonth()+1)  + "/" + t0.getDate() + "/" + t0.getFullYear() + " " 
+												 + t0.getHours() + ":" + t0.getMinutes() + ":" + t0.getSeconds();
+			/**************************************************************************************************************/
 			
 		</script>
     </body>

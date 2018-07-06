@@ -30,6 +30,12 @@ def getdata(request):
     temps = []
     pressures = []
     
+    #get date/time range from user input
+    start = request.POST.get('start')
+    end = request.POST.get('end')
+    #split dates and times
+    startDate, startTime = start.split()
+    endDate, endTime = end.split()
     
     #set max timeout
     sshtunnel.SSH_TIMEOUT = 5.0
@@ -58,15 +64,18 @@ def getdata(request):
 
             #read data from database
             c = db.cursor()
-            query2 = ("SELECT * FROM weatherVars;")
+            qStr = "SELECT * FROM weatherVars WHERE date >= \'" + startDate + "\' AND date <= \'" + endDate + "\';"
+            print('***** ', qStr)
+            query2 = (qStr)
             c.execute(query2)
-            for i in c:
-                datetimes.append('{} {}'.format(i[1], i[2]))
-                humidities.append(i[3])
-                temps.append(i[4])
-                pressures.append(i[5])
+            for line in c:
+                datetimes.append('{} {}'.format(line[1], line[2]))
+                humidities.append(line[3])
+                temps.append(line[4])
+                pressures.append(line[5])
             c.close()
             
+            #print('****\n', len(datetimes), '  ', len(humidities), '  ', len(temps), '  ', len(pressures))
             
             #add all lists to dictionary (first 4 values in database are just 0)
             data['datetimes'] = datetimes[4:]
