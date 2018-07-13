@@ -1,403 +1,187 @@
-<!-- 
-	ISSUES:
-	* 
-	
-	TODO's:
-	* adjust/understand bootstrap bc the loader/spinner moves around if you change the page size whereas other elements don't.
-	* add a simulated/real/both option to the UI
-	
--->
-
+<!DOCTYPE html>
 <html>
-    <head>
-        <title>Weather Logger</title>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>weatherloghome</title>
 		
 		{% load staticfiles %}
-		
-		<!-- favicon (no error, but still doesn't show (at least on Brave)) -->
+		<!-- favicon -->
 		<link rel="shortcut icon" href="{% static 'weatherlogicon.ico' %}" />
-		<!-- reference plotly -->
-		<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 		
-		<!-- date time picker function -->
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-		<script src="https://cdn.jsdelivr.net/momentjs/2.14.1/moment.min.js"></script>
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script>
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.min.css">
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-		
-		<!--
-		<link rel="stylesheet" type="text/css" href="css/jquery.datepick.css">
-		<script type="text/javascript" src="js/jquery.plugin.js"></script> 
-		<script type="text/javascript" src="js/jquery.datepick.js"></script>
-		-->
-		
-		
-		<!-- loading/spinner animation -->
-		<div id="wait"><img src="{% static 'rolling.gif' %}" width="64" height="64" /><br>Loading..</div>
+		<link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}" />
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Architects+Daughter" />          <!-- title font -->
+		<link rel="stylesheet" href="{% static 'css/ebs-bootstrap-datepicker-1.css' %}" />
+		<link rel="stylesheet" href="{% static 'css/ebs-bootstrap-datepicker-2.css' %}" />
+		<link rel="stylesheet" href="{% static 'css/ebs-bootstrap-datepicker-3.css' %}" />
+		<link rel="stylesheet" href="{% static 'css/ebs-bootstrap-datepicker-4.css' %}" />
+		<link rel="stylesheet" href="{% static 'css/ebs-bootstrap-datepicker.css' %}" />
+		<link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">  <!-- about panel -->
+	</head>
 
+
+	<body>
+		<!-- title -->
+		<div class="container-fluid" style="color:rgb(0,0,0);background-color:#6bace8;margin:0px;padding:0px;padding-right:15px;padding-left:15px;padding-bottom:10px;padding-top:10px;">
+			<h1 style="font-family:'Architects Daughter', cursive;"><strong>Weather Data</strong>&nbsp;<strong>Tracker</strong>- (Tampa, Florida)</h1>
+		</div>
 		
-		<!-- table style -->
-		<style>
-			#statTable, th, td {
-				width: 30%;
-				border: 2px solid black;
-				border-collapse: collapse;
-			}
-			
-			#statTable {
-				margin: auto;
-			}
-			
-			#wait {
-				display: none;
-				width: 69px;
-				height: 89px;
-				border: 1px solid black;
-				position: absolute;
-				top: 50%;
-				left: 50%;
-				padding: 2px;
-			}
-		</style>
-		
-    </head>
-	
-	
-    <body>
-		<h1>Brett's Weather Logger Site</h1>
-		
-		
-		<!-- date/time inputs-->
-		<div class="panel panel-primary">
-			<div class="panel-heading"></div>
-				<div class="panel-body">
-					<div class="row">
-						<div class='col-md-2'>
-							<div class="form-group">
-								<label class="control-label">Start Time</label>
-								<div class='input-group date' id='startdatetime'>
-									 <input type='text' id="start" class="form-control" />
-									 <span class="input-group-addon">
-										<span class="glyphicon glyphicon-calendar"></span>
-									 </span>
-								</div>
-							</div>
-						</div>
-						<div class='col-md-2'>
-							<div class="form-group">
-								<label class="control-label end">End Time</label>
-								<div class='input-group date' id='enddatetime'>
-									 <input type='text' id="end" class="form-control" />
-									 <span class="input-group-addon">
-										<span class="glyphicon glyphicon-calendar"></span>
-									 </span>
-								</div>
-							</div>
-						</div>
-					</div>
-					<button type="button" class="btn btn-primary" onclick="getdata()">Submit</button>
+		<!-- date range input -->
+		<div class="container-fluid" style="background-color:#6bace8;margin-top:10px;margin-bottom:-34px;padding-bottom:10px;">
+			<div class="row">
+				<div class="col-6">
+					<form style="margin-right:10px;margin-left:10px;">
+						<label>Start Date:&nbsp;</label>
+						<input id="start" class="form-control" type="datetime-local">
+						<label>End Date:&nbsp;</label>
+						<input id="end" class="form-control" type="datetime-local">
+						<button class="btn btn-primary" type="button" onclick="getdata()" style="width:100px;height:38px;margin:0px;padding-top:6px;padding-bottom:30px;margin-top:10px;">Go</button>
+					</form>
 				</div>
 			</div>
 		</div>
-				
+		
+		<!-- page break -->
+		<div class="container-fluid">
+			<div class="row" style="margin-top:44px;">
+				<div class="col-12">
+					<hr>
+				</div>
+			</div>
+		</div>
 		
 		
-		<!-- statistics table -->
-		<table id="statTable">
-			  <tr>
-				<th>Measurement</th>
-				<th>Average</th>
-				<th>Std. Deviation</th>
-			  </tr>
-			  <tr>
-				<td>Temperature</td>
-				<td id="tAvg"></td>
-				<td id="tStdv"></td>
-			  </tr>
-			  <tr>
-				<td>Humidity</td>
-				<td id="hAvg"></td>
-				<td id="hStdv"></td>
-			  </tr>
-			  <tr>
-				<td>Pressure</td>
-				<td id="pAvg"></td>
-				<td id="pStdv"></td>
-			  </tr>
-		</table>
+		<!-- stats table -->
+		<div class="container-fluid d-flex justify-content-center">
+			<div class="row justify-content-center align-items-center align-content-center align-self-center">
+				<div class="col-12" style="margin-top:10px;margin-bottom:12px;height:189px;">
+					<div class="table-responsive table-bordered" style="height:191px;margin-bottom:0px;padding-bottom:0px;width:540px;">
+						<table id="statTable" class="table table-striped table-bordered table-sm">
+							<caption>Actual means and standard deviations for all 3 sensors (temperature, humidity, and pressure).</caption>
+							<thead>
+								<tr>
+									<th></th>
+									<th>Temperature</th>
+									<th>Humidity</th>
+									<th>Pressure</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>Mean</td>
+									<td id="tAvg"></td>
+									<td id="hAvg"></td>
+									<td id="pAvg"></td>
+								</tr>
+								<tr>
+									<td>StDv</td>
+									<td id="tStdv"></td>
+									<td id="hStdv"></td>
+									<td id="pStdv"></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<hr>
+		
+		<!-- loading/spinner animation -->
+		<div class="container-fluid d-flex justify-content-center">
+			<div class="row justify-content-center align-items-center align-content-center align-self-center">
+				<div class="col-12">
+					<div id="wait"><img src="{% static 'rolling.gif' %}" width="64" height="64"/><br>Loading..</div>
+				</div>
+			</div>
+		</div>
 		
 		
-		<!-- plots -->
-		<div id="hPlot"></div>
-		<div id="tPlot"></div>
-		<div id="pPlot"></div>
-
-
+		<!-- time series title -->
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-6">
+					<div id="timeseries-title" align="center">
+						<h3 style="font-family:'Architects Daughter', cursive;"><strong>Time Series Plot</strong></h3>
+					</div>
+				</div>
+				<div class="col-6">
+					<div id="histogram-title" align="center">
+						<h3 style="font-family:'Architects Daughter', cursive;"><strong>Histogram</strong></h3>
+					</div>
+				</div>
+			</div>
+		</div>
 		
-
-		<script>
-			//appearance during data fetch
-			$(document).ajaxStart(function(){
-				$("#wait").css("display", "block");
-				$("#statTable").hide();
-				Plotly.purge(hPlot);
-				Plotly.purge(tPlot);
-				Plotly.purge(pPlot);
-			});
-			
-			//normal appearance
-			$(document).ajaxComplete(function(){
-				$("#wait").css("display", "none");
-				$("#statTable").show();
-			});
+		<!-- temperature plots -->
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-6">
+					<div id="tPlot" align="center"></div>
+				</div>
+				<div class="col-6">
+					<div id="tHist" align="center"></div>
+				</div>
+			</div>
+		</div>
 		
-			//start time input
-			$(function () {
-				$('#startdatetime').datetimepicker();
-			});
-			
-			//end time input
-			$(function () {
-				$('#enddatetime').datetimepicker();
-			});
-			
-			//validates and converts date/time string inputs into proper format ('yyyy-mm-dd hh:mm:ss')
-			function getValidDT(){
-				
-				//read datetimes from input boxes
-				var startString = document.getElementById("start").value;
-				var endString = document.getElementById("end").value;
-				
-				//get current datetime -> (yyyy-mm-dd hh:mm:ss) format
-				var now = new Date();
-				var nowMonth = (((now.getMonth()) < 9 ? "0" : "") + ((now.getMonth()) + 1));
-				var nowDate = (((now.getDate()) < 9 ? "0" : "") + (now.getDate()));
-				var nowHrs = (((now.getHours()) < 9 ? "0" : "") + (now.getHours()));
-				var nowMins = (((now.getMinutes()) < 9 ? "0" : "") + (now.getMinutes()));
-				var nowSecs = (((now.getSeconds()) < 9 ? "0" : "") + (now.getSeconds()));
-				var nowString = now.getFullYear() + "-" + nowMonth + "-" + nowDate + " " + nowHrs + ":" + nowMins + ":" + nowSecs;
-				
-				/**handle empty strings**/
-				//set starting datetime to earliest data point if empty
-				if (startString == "") {
-					startString = "2018-06-07 00:00:00";
-				}
-				//set ending datetime to current if empty
-				if (endString == "") {
-					endString = nowString;
-				}
-				
-				
-				/**handle boundary and order problems**/
-				var start = new Date(startString);
-				var end = new Date(endString);
-				//display error and return failure if dates out of order
-				if(start >= end){
-					alert("**End time must come after start time");
-					return null;
-				}
-
-				//date/time must be AFTER initial sensor data (June 7, 2018)
-				if (start < new Date("2018-06-07 00:00:00")) {
-					startString = "2018-06-07 00:00:00";
-				}
-				//date/time must be BEFORE current date/time
-				if (end > now) {
-					endString = nowString;
-				}
-				
-				
-				/**Finalize datetime strings -> (yyyy-mm-dd hh:mm:ss) format**/
-				//finalize start datetime input 
-				var startMonth = (((start.getMonth()) < 9 ? "0" : "") + ((start.getMonth()) + 1));
-				var startDate = (((start.getDate()) < 9 ? "0" : "") + ((start.getDate())));
-				var startHrs = (((start.getHours()) < 9 ? "0" : "") + ((start.getHours())));
-				var startMins = (((start.getMinutes()) < 9 ? "0" : "") + ((start.getMinutes())));
-				var startSecs = (((start.getSeconds()) < 9 ? "0" : "") + ((start.getSeconds())));
-				startString = start.getFullYear() + "-" + startMonth + "-" + startDate + " " + startHrs + ":" + startMins + ":" + startSecs;
-				//finalize end datetime input
-				var endMonth = (((end.getMonth()) < 9 ? "0" : "") + ((end.getMonth()) + 1));
-				var endDate = (((end.getDate()) < 9 ? "0" : "") + ((end.getDate())));
-				var endHrs = (((end.getHours()) < 9 ? "0" : "") + ((end.getHours())));
-				var endMins = (((end.getMinutes()) < 9 ? "0" : "") + ((end.getMinutes())));
-				var endSecs = (((end.getSeconds()) < 9 ? "0" : "") + ((end.getSeconds())));
-				endString = end.getFullYear() + "-" + endMonth + "-" + endDate + " " + endHrs + ":" + endMins + ":" + endSecs;
-				
-				
-				return [startString, endString];
-			} //end validateDT
-
+		<hr>
 		
-			//fetches data from database
-			function getdata(){
-				
-				//real values
-				var datetimes = [];
-				var humidities = [];
-				var temps = [];
-				var pressures = [];
-				
-				//sim values
-				var simDates = [];
-				var hSims = [];
-				var tSims = [];
-				var pSims = [];
-			
-				//stats table values
-				var hAvg, tAvg, pAvg;
-				var hStdv, tStdv, pStdv;
-				
-
-				/**get valid start and end datetimes**/
-				var validated = getValidDT();
-				//return failure if dates are out of order
-				if (validated == null){
-					return null;
-				}
-				var startString = validated[0];
-				var endString = validated[1];
-	
-	
-				//fetch data from database
-				$.ajax({
-					type: "POST",
-					dataType: "json",
-					data: {'start': startString, 'end':endString},
-					url: "getdata/",
-					success: function(result){
-					    //real values
-						datetimes = result.datetimes.slice(0);
-						humidities = result.humidities.slice(0);
-						temps = result.temps.slice(0);
-						pressures = result.pressures.slice(0);
-						//sim values
-						simDates = result.simDates.slice(0);
-						hSims = result.hSims.slice(0);
-						tSims = result.tSims.slice(0);
-						pSims = result.pSims.slice(0);
-						
-						//calculate statistics values
-						let {mean: hAvg, deviation: hStdv} = stats(humidities);
-						let {mean: tAvg, deviation: tStdv} = stats(temps);
-						let {mean: pAvg, deviation: pStdv} = stats(pressures);
-						
-						//set humidity table values
-						document.getElementById("hAvg").innerHTML = hAvg;
-						document.getElementById("hStdv").innerHTML = hStdv;
-						//set temperature table values
-						document.getElementById("tAvg").innerHTML = tAvg;
-						document.getElementById("tStdv").innerHTML = tStdv;
-						//set pressure table values
-						document.getElementById("pAvg").innerHTML = pAvg;
-						document.getElementById("pStdv").innerHTML = pStdv;
-						
-						
-						
-						//draw plots
-						//plot(datetimes, humidities, "Humidity", "humids", "hPlot");
-						//plot(datetimes, temps, "Temperature", "celcius", "tPlot");
-						//plot(datetimes, pressures, "Pressure", "kBar", "pPlot");
-						plot(datetimes, humidities, simDates, hSims, "Humidity", "humids", "hPlot"); 
-						plot(datetimes, temps, simDates, tSims, "Temperature", "celcius", "tPlot"); 
-						plot(datetimes, pressures, simDates, pSims, "Pressure", "kBar", "pPlot");
-					}, 
-					error: function(jqxhr, stat, exception){
-						alert("failed to access data");
-					}
-				});//end ajax()
-
-			}//end getdata()
-			
-			
-			//returns mean and standard deviation of array
-			function stats(arr) {
-				var n = arr.length;
-				var sum = 0;
-				var mean;
-				var variance = 0.0;
-				var v1 = 0.0;
-				var v2 = 0.0;
-				
-				//get mean
-				arr.map(function(data) {
-					sum+=data;
-				});
-				mean = sum / n;
-				
-				//get stdv
-				if (n > 1) {
-					for (var i = 0; i < n; i++) {
-						v1 += Math.pow((arr[i] - mean), 2);
-						v2 += (arr[i] - mean);
-					}
-
-					v2 = v2 * v2 / n;
-					variance = (v1 - v2) / (n-1);
-					
-					if (variance < 0){ 
-						variance = 0; 
-					}
-					
-					stddev = Math.sqrt(variance);
-				}
-
-				return {
-					mean: Math.round(mean * 100)/100,
-					deviation: Math.round(stddev * 100)/100
-				};
-			}; //end stats
-			
-
-			//draws time series plot with real and simulated values
-			function plot(dates, values, simDates, sims, Title, units, div){
-				
-				var plot1 = document.getElementById(div);
-				
-				var trace = [{x: dates, y: values, type: 'bar', name: 'Real data'}];
-				var traceSim = [{x: simDates, y: sims, type: 'linear', name: 'Sim data'}];
-				
-				var layout = {
-					title: Title,
-					xaxis: {
-						title: 'time',
-						titlefont: {
-							family: 'Courier New, monospace',
-							size: 18,
-							color: '#7f7f7f'
-						},
-						type: 'date',
-						range: [dates[0], dates[(dates.length) - 1]]
-					},
-					yaxis: {
-						title: units,
-						titlefont: {
-							family: 'Courier New, monospace',
-							size: 18,
-							color: '#7f7f7f'
-						},
-						range: [Math.min.apply(null, sims), Math.max.apply(null, sims)]
-					}
-				};
-				
-				Plotly.newPlot(plot1, traceSim, layout);//(versus Plotly.plot which appends new data to old plot)
-				Plotly.plot(plot1, trace, layout); 
-			
-			}//end plot
-			
-			
-			/**RUN AT PAGE STARTUP*****************************************************************************************/
-			//get data on page startup
-			getdata();
-			
-			//initialize start and end date/time inputs
-			document.getElementById("start").value = "06/07/2018 12:00 AM";
-			t0 = new Date();
-			document.getElementById("end").value = (t0.getMonth()+1)  + "/" + t0.getDate() + "/" + t0.getFullYear() + " " 
-												 + t0.getHours() + ":" + t0.getMinutes() + ":" + t0.getSeconds();
-			/**************************************************************************************************************/
-			
-		</script>
-    </body>
+		<!-- humidity plots -->
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-6">
+					<div id="hPlot" align="center"></div>
+				</div>
+				<div class="col-6">
+					<div id="hHist" align="center"></div>
+				</div>
+			</div>
+		</div>
+		
+		<hr>
+		
+		<!-- pressure plots -->
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-6">
+					<div id="pPlot" align="center"></div>
+				</div>
+				<div class="col-6">
+					<div id="pHist" align="center"></div>
+				</div>
+			</div>
+		</div>
+		
+		
+		<!-- Footer/About section -->
+		<div class="panel panel-info">
+			<div class="panel-heading">About</div>
+			<div class="panel-body">
+				Data from this website is gathered using a sensor (BME280) and Raspberry Pi 3 for processing and uploading.<br>
+				The circuit is located in Tampa, Fl and is maintained by the website operator. <br> <br>
+				Brett Farmer <br>
+				<a href="#">LinkedIn</a> <br>
+				<a href="#">Github</a>
+			</div>
+		</div>
+		
+		
+		<!-- reference plotly -->
+		<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+		<!-- datetime picker ext files -->
+		<script src="{% static '/js/jquery.min.js' %}" /></script>
+		<script src="{% static '/bootstrap/js/bootstrap.min.js' %}" /></script>
+		<script src="{% static '/js/Bootstrap-DateTime-Picker-1.js' %}" /></script>
+		<script src="{% static '/js/Bootstrap-DateTime-Picker-2.js' %}" /></script>
+		<script src="{% static '/js/Bootstrap-DateTime-Picker.js' %}" /></script>
+		<script src="{% static '/js/ebs-bootstrap-datepicker-1.js' %}" /></script>
+		<script src="{% static '/js/ebs-bootstrap-datepicker.js' %}" /></script>
+		<!-- Miscellaneous scripts -->
+		<script src="{% static '/js/weatherScript.js' %}" /></script>
+		
+	</body>
 </html>
