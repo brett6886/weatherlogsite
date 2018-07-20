@@ -5,20 +5,22 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>weatherloghome</title>
-		
+
 		{% load staticfiles %}
 		<!-- favicon -->
-		<link rel="shortcut icon" href="{% static 'weatherlogicon.ico' %}" />
-		
-		<link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}" />
+		<link rel="icon" href="/weatherlogicon.ico" type="image/x-icon"/>
+		<link rel="shortcut icon" href="{% static 'weatherlogicon.ico' %}" type="image/x-icon"/>
+
+		<link rel="stylesheet" href="{% static '/bootstrap/css/bootstrap.min.css' %}" />
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Architects+Daughter" />          <!-- title font -->
-		<link rel="stylesheet" href="{% static 'css/ebs-bootstrap-datepicker-1.css' %}" />
-		<link rel="stylesheet" href="{% static 'css/ebs-bootstrap-datepicker-2.css' %}" />
-		<link rel="stylesheet" href="{% static 'css/ebs-bootstrap-datepicker-3.css' %}" />
-		<link rel="stylesheet" href="{% static 'css/ebs-bootstrap-datepicker-4.css' %}" />
-		<link rel="stylesheet" href="{% static 'css/ebs-bootstrap-datepicker.css' %}" />
-		<link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+		<link rel="stylesheet" href="{% static '/css/ebs-bootstrap-datepicker-1.css' %}" />
+		<link rel="stylesheet" href="{% static '/css/ebs-bootstrap-datepicker-2.css' %}" />
+		<link rel="stylesheet" href="{% static '/css/ebs-bootstrap-datepicker-3.css' %}" />
+		<link rel="stylesheet" href="{% static '/css/ebs-bootstrap-datepicker-4.css' %}" />
+		<link rel="stylesheet" href="{% static '/css/ebs-bootstrap-datepicker.css' %}" />
+		<link rel="stylesheet" href="{% static '/css/styles.css' %}" />
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">  <!-- about panel -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 	</head>
 
 
@@ -27,69 +29,71 @@
 		<div class="container-fluid" style="color:rgb(0,0,0);background-color:#6bace8;margin:0px;padding:0px;padding-right:15px;padding-left:15px;padding-bottom:10px;padding-top:10px;">
 			<h1 style="font-family:'Architects Daughter', cursive;"><strong>Weather Data</strong>&nbsp;<strong>Tracker</strong>- (Tampa, Florida)</h1>
 		</div>
-		
-		<!-- date range input -->
-		<div class="container-fluid" style="background-color:#6bace8;margin-top:10px;margin-bottom:-34px;padding-bottom:10px;">
-			<div class="row">
-				<div class="col-6">
-					<form style="margin-right:10px;margin-left:10px;">
-						<label>Start Date:&nbsp;</label>
+
+
+        <!-- input form -->
+		<div class="container-fluid" style="background-color:#6bace8;">
+			<form class="form-vertical">
+				<div class="form-group row">
+					<div class="col-xs-10 col-md-4">
+						<label for="start">Start Date:&nbsp;</label>
 						<input id="start" class="form-control" type="datetime-local">
-						<label>End Date:&nbsp;</label>
-						<input id="end" class="form-control" type="datetime-local">
-						<button class="btn btn-primary" type="button" onclick="getdata()" style="width:100px;height:38px;margin:0px;padding-top:6px;padding-bottom:30px;margin-top:10px;">Go</button>
-					</form>
-				</div>
-			</div>
-		</div>
-		
-		<!-- page break -->
-		<div class="container-fluid">
-			<div class="row" style="margin-top:44px;">
-				<div class="col-12">
-					<hr>
-				</div>
-			</div>
-		</div>
-		
-		
-		<!-- stats table -->
-		<div class="container-fluid d-flex justify-content-center">
-			<div class="row justify-content-center align-items-center align-content-center align-self-center">
-				<div class="col-12" style="margin-top:10px;margin-bottom:12px;height:189px;">
-					<div class="table-responsive table-bordered" style="height:191px;margin-bottom:0px;padding-bottom:0px;width:540px;">
-						<table id="statTable" class="table table-striped table-bordered table-sm">
-							<caption>Actual means and standard deviations for all 3 sensors (temperature, humidity, and pressure).</caption>
-							<thead>
-								<tr>
-									<th></th>
-									<th>Temperature</th>
-									<th>Humidity</th>
-									<th>Pressure</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>Mean</td>
-									<td id="tAvg"></td>
-									<td id="hAvg"></td>
-									<td id="pAvg"></td>
-								</tr>
-								<tr>
-									<td>StDv</td>
-									<td id="tStdv"></td>
-									<td id="hStdv"></td>
-									<td id="pStdv"></td>
-								</tr>
-							</tbody>
-						</table>
 					</div>
 				</div>
-			</div>
+				<div class="form-group row">
+					<div class="col-xs-10 col-md-4">
+						<label for="end">End Date:&nbsp;</label>
+						<input id="end" class="form-control" type="datetime-local">
+					</div>
+				</div>
+				<div class="form-group">
+					<button class="btn btn-primary" type="button" onclick="getdata()">Submit</button>
+				</div>
+			</form>
 		</div>
-		
-		<hr>
-		
+
+
+        <!-- show error message if data comes back empty -->
+        <div class="container-fluid d-flex justify-content-center h3">
+			<div class="row justify-content-center align-items-center align-content-center align-self-center">
+				<div class="col-12">
+				    <div id="err"></div>
+				</div>
+			</div>
+	    </div>
+
+
+        <!-- stats table -->
+        <div id="statTable" class="table-responsive table table-striped table-bordered" style="margin-top:20px;">
+			<table id="statTable" style="margin:auto; margin-top:15px; margin-bottom:15px;">
+				<caption style="text-align:center;">Actual means and standard deviations for all 3 sensors (temperature, humidity, and pressure).</caption>
+				<thead>
+					<tr>
+						<th></th>
+						<th>Temperature</th>
+						<th>Humidity</th>
+						<th>Pressure</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Mean</td>
+						<td id="tAvg"></td>
+						<td id="hAvg"></td>
+						<td id="pAvg"></td>
+					</tr>
+					<tr>
+						<td>StDv</td>
+						<td id="tStdv"></td>
+						<td id="hStdv"></td>
+						<td id="pStdv"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+
+
 		<!-- loading/spinner animation -->
 		<div class="container-fluid d-flex justify-content-center">
 			<div class="row justify-content-center align-items-center align-content-center align-self-center">
@@ -98,25 +102,17 @@
 				</div>
 			</div>
 		</div>
-		
-		
-		<!-- time series title -->
+
+
+
+        <!-- temperature plots -->
 		<div class="container-fluid">
-			<div class="row">
-				<div class="col-6">
-					<div id="timeseries-title" align="center">
-						<h3 style="font-family:'Architects Daughter', cursive;"><strong>Time Series Plot</strong></h3>
-					</div>
-				</div>
-				<div class="col-6">
-					<div id="histogram-title" align="center">
-						<h3 style="font-family:'Architects Daughter', cursive;"><strong>Histogram</strong></h3>
-					</div>
+			<div class="row" style="background-color:#6bace8;">
+			    <div class="col-xs-10">
+				    <h3 style="font-family:'Architects Daughter', cursive;"><strong>Temperature</strong></h3>
 				</div>
 			</div>
 		</div>
-		
-		<!-- temperature plots -->
 		<div class="container-fluid">
 			<div class="row">
 				<div class="col-6">
@@ -127,10 +123,19 @@
 				</div>
 			</div>
 		</div>
-		
+
+
 		<hr>
-		
-		<!-- humidity plots -->
+
+
+        <!-- humidity plots -->
+        <div class="container-fluid">
+			<div class="row" style="background-color:#6bace8;">
+			    <div class="col-xs-10">
+				    <h3 style="font-family:'Architects Daughter', cursive;"><strong>Humidity</strong></h3>
+				</div>
+			</div>
+		</div>
 		<div class="container-fluid">
 			<div class="row">
 				<div class="col-6">
@@ -141,10 +146,19 @@
 				</div>
 			</div>
 		</div>
-		
+
+
 		<hr>
-		
-		<!-- pressure plots -->
+
+
+        <!-- pressure plots -->
+        <div class="container-fluid">
+			<div class="row" style="background-color:#6bace8;">
+			    <div class="col-xs-10">
+				    <h3 style="font-family:'Architects Daughter', cursive;"><strong>Pressure</strong></h3>
+				</div>
+			</div>
+		</div>
 		<div class="container-fluid">
 			<div class="row">
 				<div class="col-6">
@@ -155,33 +169,37 @@
 				</div>
 			</div>
 		</div>
-		
-		
+
+
+        <hr>
 		<!-- Footer/About section -->
 		<div class="panel panel-info">
 			<div class="panel-heading">About</div>
 			<div class="panel-body">
 				Data from this website is gathered using a sensor (BME280) and Raspberry Pi 3 for processing and uploading.<br>
-				The circuit is located in Tampa, Fl and is maintained by the website operator. <br> <br>
-				Brett Farmer <br>
-				<a href="#">LinkedIn</a> <br>
-				<a href="#">Github</a>
+				The first measurement was taken on 06/08/2018 12:41 PM. The circuit is located in Tampa, Fl and is maintained <br>
+				by the website operator. <br> <br>
+				<strong>Brett Farmer</strong> <br>
+
+				<a href="https://www.linkedin.com/in/brett-farmer/" target="_blank">
+				    <i class="fa fa-linkedin-square" style="font-size:36px"></i>
+				</a>
+				<a href="https://github.com/brett6886" target="_blank">
+				    <i class="fa fa-github" style="font-size:36px; color:black;"></i>
+				</a>
 			</div>
 		</div>
-		
-		
+
+
 		<!-- reference plotly -->
 		<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 		<!-- datetime picker ext files -->
 		<script src="{% static '/js/jquery.min.js' %}" /></script>
 		<script src="{% static '/bootstrap/js/bootstrap.min.js' %}" /></script>
-		<script src="{% static '/js/Bootstrap-DateTime-Picker-1.js' %}" /></script>
-		<script src="{% static '/js/Bootstrap-DateTime-Picker-2.js' %}" /></script>
-		<script src="{% static '/js/Bootstrap-DateTime-Picker.js' %}" /></script>
-		<script src="{% static '/js/ebs-bootstrap-datepicker-1.js' %}" /></script>
-		<script src="{% static '/js/ebs-bootstrap-datepicker.js' %}" /></script>
+		<script type="text/javascript" src="https://platform.linkedin.com/badges/js/profile.js" async defer></script>
+
 		<!-- Miscellaneous scripts -->
 		<script src="{% static '/js/weatherScript.js' %}" /></script>
-		
+
 	</body>
 </html>
